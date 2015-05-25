@@ -23,7 +23,7 @@ public class LoadDataMapper extends
 	public void map(LongWritable key, Text value, Context context)
 			throws IOException, InterruptedException {
 		String line = value.toString();
-		int rowkey=line.hashCode();
+		int rowkey = line.hashCode();
 
 		System.out.println(line);
 
@@ -33,17 +33,18 @@ public class LoadDataMapper extends
 		ImmutableBytesWritable HKey = new ImmutableBytesWritable(
 				Bytes.toBytes(rowkey));
 		Put HPut = new Put(Bytes.toBytes(rowkey));
-//		HPut.add(Bytes.toBytes(Program.Family1), Bytes.toBytes(row[0]),
-//				Bytes.toBytes(row[1]));
-//		HPut.add(Bytes.toBytes(Program.Family2), Bytes.toBytes(row[0]),
-//				Bytes.toBytes(row[2]));
-//		context.write(HKey, HPut);
-		
+		// HPut.add(Bytes.toBytes(Program.Family1), Bytes.toBytes(row[0]),
+		// Bytes.toBytes(row[1]));
+		// HPut.add(Bytes.toBytes(Program.Family2), Bytes.toBytes(row[0]),
+		// Bytes.toBytes(row[2]));
+		// context.write(HKey, HPut);
+
 		Configuration conf = HBaseConfiguration.create();
-		HTable table = new HTable(conf, Program.Table1);
-		HPut.add(Bytes.toBytes(Program.Family1), Bytes.toBytes(row[0]),
+		HTable table = new HTable(conf, initiateData.Table1);
+
+		HPut.add(Bytes.toBytes(initiateData.Family1), Bytes.toBytes(row[0]),
 				Bytes.toBytes(row[1]));
-		HPut.add(Bytes.toBytes(Program.Family2), Bytes.toBytes(row[0]),
+		HPut.add(Bytes.toBytes(initiateData.Family2), Bytes.toBytes(row[0]),
 				Bytes.toBytes(row[2]));
 		table.put(HPut);
 	}
