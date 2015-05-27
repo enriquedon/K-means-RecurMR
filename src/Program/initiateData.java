@@ -59,8 +59,8 @@ public class initiateData {
 				// System.out.println(new String(kv.getKeyString()) + ":");
 				// System.out.println(new String(kv.getQualifier()) + " ");
 				// System.out.print(kv.getTimestamp() + " ");
-				// System.out.println(new String(kv.getValue()));
-				HPut.add(kv.getFamily(), kv.getQualifier(), kv.getValue());
+//				 System.out.println(new String(kv.getValue()));
+				HPut.add(kv.getFamily(), Bytes.toBytes("center"), kv.getValue());
 			}
 			centerTable.put(HPut);
 		}

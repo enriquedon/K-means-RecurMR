@@ -17,7 +17,7 @@ import Program.*;
 public class LoadDataMapper extends
 		Mapper<LongWritable, Text, ImmutableBytesWritable, Put> {
 
-	public static int columns = 10;
+//	public static int columns = 10;
 
 	@SuppressWarnings("deprecation")
 	public void map(LongWritable key, Text value, Context context)
@@ -25,7 +25,7 @@ public class LoadDataMapper extends
 		String line = value.toString();
 		int rowkey = line.hashCode();
 
-		System.out.println(line);
+//		System.out.println(line);
 
 		// qualifier,area,property
 		String[] row = rowToList(line);
@@ -50,14 +50,19 @@ public class LoadDataMapper extends
 	}
 
 	private String[] rowToList(String line) {
-		String[] rowa = new String[columns];
+		String[] rowa = new String[Program.numOfColumn];
 		String[] rowb = new String[3];
 		rowa = line.split("	");
 		String area = rowa[0] + "	" + rowa[4] + "	" + rowa[5] + "	" + rowa[8]
 				+ "	" + rowa[9];
 		String property = rowa[1] + "	" + rowa[2] + "	" + rowa[3] + "	"
 				+ rowa[6] + "	" + rowa[7];
-		rowb[0] = line;
+		
+		//!!!!!!!!
+		rowb[0]="data";
+//		rowb[0] = line;
+		
+		
 		rowb[1] = area;
 		rowb[2] = property;
 		return rowb;
