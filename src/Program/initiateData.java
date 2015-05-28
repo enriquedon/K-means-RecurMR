@@ -24,46 +24,12 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import PrepareData.LoadDataMapper;
 
 public class initiateData {
-	public static final String Table1 = "SchemaData";
-	public static final String Table2 = "Center";
-	public static final String Family1 = "Area";
-	public static final String Family2 = "Property";
-
+	
 	void initiateHTables(Path input, int numOfclusters)
 			throws ClassNotFoundException, IOException, InterruptedException {
 		loadDataInHBase(input);
-		loadInitialCluster(numOfclusters);
+		loadInitialCenter(numOfclusters);
 
-	}
-
-	private void loadInitialCluster(int numOfclusters) throws IOException {
-
-		Configuration conf = HBaseConfiguration.create();
-		HTable dataTable = new HTable(conf, Table1);
-		HTable centerTable = new HTable(conf, Table2);
-		Scan s = new Scan();
-		ResultScanner ss = dataTable.getScanner(s);
-		Put HPut = null;
-		ImmutableBytesWritable HKey;
-
-		int i = 0;
-		for (Result r : ss) {
-			if (i == numOfclusters) {
-				break;
-			}
-			i++;
-			HKey = new ImmutableBytesWritable(Bytes.toBytes(i));
-			HPut = new Put(Bytes.toBytes(i));
-			for (KeyValue kv : r.raw()) {
-				// System.out.print(new String(kv.getRow()) + " ");
-				// System.out.println(new String(kv.getKeyString()) + ":");
-				// System.out.println(new String(kv.getQualifier()) + " ");
-				// System.out.print(kv.getTimestamp() + " ");
-//				 System.out.println(new String(kv.getValue()));
-				HPut.add(kv.getFamily(), Bytes.toBytes("center"), kv.getValue());
-			}
-			centerTable.put(HPut);
-		}
 	}
 
 	@SuppressWarnings("deprecation")
@@ -91,35 +57,6 @@ public class initiateData {
 		// System.exit(job.waitForCompletion(true) ? 0 : 1);
 	}
 
-	// private void loadDataInHBase(Path input) {
-	// JobConf conf = new JobConf(getConf(), Program.class);
-	// conf.setJobName("Prepare data in Hbase");
-	//
-	// Scan scan = new Scan();
-	// scan.setCaching(500); // 1 is the default in Scan, which will be bad for
-	// // MapReduce jobs
-	// scan.setCacheBlocks(false); // don't set to true for MR jobs
-	// // set other scan attrs
-	// FileInputFormat.addInputPath(conf, input);
-	//
-	// conf.setSpeculativeExecution(false);
-	// conf.setReduceSpeculativeExecution(false);
-	// conf.setInputFormat(TextInputFormat.class);
-	//
-	// // conf.setOutputFormat( HFileOutputFormat.class);
-	// conf.setOutputKeyClass(ImmutableBytesWritable.class);
-	// conf.setOutputValueClass(Put.class);
-	// conf.setMapperClass(LoadDataMapper.class);
-	//
-	//
-	// // TableMapReduceUtil.initTableMapJob(
-	// // Table1,
-	// // scan,
-	// // LoadDataMapper.class,
-	// // Text.class, Result.class, conf);
-	// conf.setNumReduceTasks(0);
-	//
-	// }
 
 	void create2HTable() throws IOException {
 		// Instantiating configuration class
@@ -152,4 +89,41 @@ public class initiateData {
 		admin.createTable(tableDescriptor1);
 		admin.createTable(tableDescriptor2);
 	}
+
+	private void loadInitialCenter(int numOfclusters) throws IOException {
+
+		Configuration conf = HBaseConfiguration.create();
+		HTable dataTable = new HTable(conf, Table1);
+		HTable centerTable = new HTable(conf, Table2);
+		Scan s = new Scan();
+		ResultScanner ss = dataTable.getScanner(s);
+		Put HPut = null;
+//		ImmutableBytesWritable HKey;
+
+		int i = 0;
+		for (Result r : ss) {
+			if (i == numOfclusters) {
+				break;
+			}
+			
+//			HKey = new ImmutableBytesWritable(Bytes.toBytes(Integer.toString(i)));
+			HPut = new Put(Bytes.toBytes(Integer.toString(i)));
+			for (KeyValue kv : r.raw()) {
+//				 System.out.println(new String(kv.getRow()) + "!!!!!!!!!!");
+				// System.out.println(new String(kv.getKeyString()) + ":");
+				// System.out.println(new String(kv.getQualifier()) + " ");
+				// System.out.print(kv.getTimestamp() + " ");
+//				 System.out.println(new String(kv.getValue()));
+				HPut.add(kv.getFamily(), kv.getQualifier(), kv.getValue());
+			}
+			centerTable.put(HPut);
+			i++;
+		}
+	}
+
+	public static final String Table1 = globalNameSpace.Table1;
+	public static final String Table2 = globalNameSpace.Table2;
+	public static final String Family1 = globalNameSpace.Family1;
+	public static final String Family2 = globalNameSpace.Family2;
+
 }

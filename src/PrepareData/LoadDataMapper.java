@@ -12,12 +12,12 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-import Program.*;
+import Program.globalNameSpace;
+
 
 public class LoadDataMapper extends
 		Mapper<LongWritable, Text, ImmutableBytesWritable, Put> {
 
-//	public static int columns = 10;
 
 	@SuppressWarnings("deprecation")
 	public void map(LongWritable key, Text value, Context context)
@@ -25,46 +25,57 @@ public class LoadDataMapper extends
 		String line = value.toString();
 		int rowkey = line.hashCode();
 
-//		System.out.println(line);
-
 		// qualifier,area,property
-		String[] row = rowToList(line);
+//		String[] row = rowToList(line);
+		String[] row = new String[columns];
+		row = line.split("	");
+		
 		// String rowKey = null;
-		ImmutableBytesWritable HKey = new ImmutableBytesWritable(
-				Bytes.toBytes(rowkey));
+//		ImmutableBytesWritable HKey = new ImmutableBytesWritable(
+//				Bytes.toBytes(rowkey));
 		Put HPut = new Put(Bytes.toBytes(rowkey));
-		// HPut.add(Bytes.toBytes(Program.Family1), Bytes.toBytes(row[0]),
-		// Bytes.toBytes(row[1]));
-		// HPut.add(Bytes.toBytes(Program.Family2), Bytes.toBytes(row[0]),
-		// Bytes.toBytes(row[2]));
-		// context.write(HKey, HPut);
 
 		Configuration conf = HBaseConfiguration.create();
-		HTable table = new HTable(conf, initiateData.Table1);
+		HTable table = new HTable(conf, Table1);
 
-		HPut.add(Bytes.toBytes(initiateData.Family1), Bytes.toBytes(row[0]),
+		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(x1),
+				Bytes.toBytes(row[0]));
+		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(x5),
+				Bytes.toBytes(row[4]));
+		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(x6),
+				Bytes.toBytes(row[5]));
+		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(y1),
+				Bytes.toBytes(row[8]));
+		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(y2),
+				Bytes.toBytes(row[9]));
+		
+		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x2),
 				Bytes.toBytes(row[1]));
-		HPut.add(Bytes.toBytes(initiateData.Family2), Bytes.toBytes(row[0]),
+		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x3),
 				Bytes.toBytes(row[2]));
+		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x4),
+				Bytes.toBytes(row[3]));
+		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x7),
+				Bytes.toBytes(row[6]));
+		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x8),
+				Bytes.toBytes(row[7]));
 		table.put(HPut);
 	}
 
-	private String[] rowToList(String line) {
-		String[] rowa = new String[Program.numOfColumn];
-		String[] rowb = new String[3];
-		rowa = line.split("	");
-		String area = rowa[0] + "	" + rowa[4] + "	" + rowa[5] + "	" + rowa[8]
-				+ "	" + rowa[9];
-		String property = rowa[1] + "	" + rowa[2] + "	" + rowa[3] + "	"
-				+ rowa[6] + "	" + rowa[7];
-		
-		//!!!!!!!!
-		rowb[0]="data";
-//		rowb[0] = line;
-		
-		
-		rowb[1] = area;
-		rowb[2] = property;
-		return rowb;
-	}
+	public static int columns = globalNameSpace.numOfColumn;
+	public static final String Table1 = globalNameSpace.Table1;
+	public static final String Table2 = globalNameSpace.Table2;
+	public static final String Family1 =globalNameSpace.Family1;
+	public static final String Family2 = globalNameSpace.Family2;
+	public static final String x1=globalNameSpace.x1;
+	public static final String x2=globalNameSpace.x2;
+	public static final String x3=globalNameSpace.x3;
+	public static final String x4=globalNameSpace.x4;
+	public static final String x5=globalNameSpace.x5;
+	public static final String x6=globalNameSpace.x6;
+	public static final String x7=globalNameSpace.x7;
+	public static final String x8=globalNameSpace.x8;
+	public static final String y1=globalNameSpace.y1;
+	public static final String y2=globalNameSpace.y2;
+
 }
