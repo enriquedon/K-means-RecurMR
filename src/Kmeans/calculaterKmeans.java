@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Program.Program;
+import Program.globalNameSpace;
 
 public class calculaterKmeans {
 	// List<List<Double>> centers = new ArrayList<List<Double>>();
 	// static List<Double> curData = new ArrayList<Double>();
-	public static final int numOfColumn = Program.numOfColumn;
-	public static int numOfclusters = Program.numOfclusters;
 
-	public static int calkmeans(List<String> centersInString, String dataString) {
+	public int calkmeans(List<String> centersInString, String dataString) {
 
 		double[][] centers = new double[numOfclusters][numOfColumn];
 		double[] curData = new double[numOfColumn];
@@ -21,7 +20,7 @@ public class calculaterKmeans {
 		return chooseTheClosetCenter(centers, curData);
 	}
 
-	private static int chooseTheClosetCenter(double[][] centers,
+	private int chooseTheClosetCenter(double[][] centers,
 			double[] curData) {
 		double[] curCenter = new double[numOfColumn];
 		int numOfClueter = 0;
@@ -41,9 +40,9 @@ public class calculaterKmeans {
 		return numOfClueter;
 	}
 
-	private static double[][] parseCenters(List<String> centersInString) {
+	private double[][] parseCenters(List<String> centersInString) {
 		if (centersInString.size() != numOfclusters) {
-			System.err.println("centersInString.size()!=numOfclusters");
+			System.err.println("centersInString.size(): "+centersInString.size()+" !=numOfclusters:"+" numOfclusters");
 		}
 		double[][] centers = new double[numOfclusters][numOfColumn];
 		for (int i = 0; i < numOfclusters; i++) {
@@ -52,7 +51,7 @@ public class calculaterKmeans {
 		return centers;
 	}
 
-	static double[] parseData(String dataString) {
+	private double[] parseData(String dataString) {
 		String[] curDataInString = new String[numOfColumn];
 		double[] curData = new double[numOfColumn];
 		curDataInString = dataString.split("	");
@@ -61,5 +60,8 @@ public class calculaterKmeans {
 		}
 		return curData;
 	}
+	
+	public static final int numOfColumn = globalNameSpace.numOfColumn;
+	public static int numOfclusters = globalNameSpace.numOfclusters;
 
 }

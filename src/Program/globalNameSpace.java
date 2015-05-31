@@ -20,6 +20,13 @@ public class globalNameSpace {
 	public static final String y1 = "Y1";
 	public static final String y2 = "Y2";
 	
+	public static int getNumOfclusters() {
+		return numOfclusters;
+	}
+	public static void setNumOfclusters(int numOfclusters) {
+		globalNameSpace.numOfclusters = numOfclusters;
+	}
+	
 	
 
 

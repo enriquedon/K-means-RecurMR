@@ -1,22 +1,20 @@
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 public class test {
 
 	public static void main(String[] args) {
-		String a = "0.86	588.00	294.00	147.00	7.00	4	0.00	0	19.34	23.49";
-		double[] rowb = rowToList(a);
-		for (double d : rowb) {
-			System.out.print(d + ",");
-		}
+		System.out.print(randInt(0,13));
 	}
 
 	private Set<Long> getRndCenter(int numOfclusters) {
 
-		Set<Long> centers =new HashSet<Long>();
-		for(int i=0;i<numOfclusters;i++){
-			int rnd=(int)(Math.random()*768);
-		}return centers;
+		Set<Long> centers = new HashSet<Long>();
+		for (int i = 0; i < numOfclusters; i++) {
+			int rnd = (int) (Math.random() * 768);
+		}
+		return centers;
 	}
 
 	private static double[] rowToList(String line) {
@@ -28,5 +26,11 @@ public class test {
 			rowb[i] = Double.parseDouble(rowa[i]);
 		}
 		return rowb;
+	}
+
+	public static int randInt(int min, int max) {
+		Random rand = new Random();
+		int randomNum = rand.nextInt((max - min) + 1) + min;
+		return randomNum;
 	}
 }

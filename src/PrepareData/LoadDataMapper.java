@@ -12,6 +12,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
+import Kmeans.kmeansReducer.UpdateCounter;
 import Program.globalNameSpace;
 
 
@@ -26,15 +27,10 @@ public class LoadDataMapper extends
 		int rowkey = line.hashCode();
 
 		// qualifier,area,property
-//		String[] row = rowToList(line);
 		String[] row = new String[columns];
 		row = line.split("	");
 		
-		// String rowKey = null;
-//		ImmutableBytesWritable HKey = new ImmutableBytesWritable(
-//				Bytes.toBytes(rowkey));
 		Put HPut = new Put(Bytes.toBytes(rowkey));
-
 		Configuration conf = HBaseConfiguration.create();
 		HTable table = new HTable(conf, Table1);
 
@@ -60,8 +56,13 @@ public class LoadDataMapper extends
 		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x8),
 				Bytes.toBytes(row[7]));
 		table.put(HPut);
+		context.getCounter(RowCounter.numOfRow).increment(1);
 	}
-
+	
+	public enum RowCounter {
+		numOfRow
+	}
+	
 	public static int columns = globalNameSpace.numOfColumn;
 	public static final String Table1 = globalNameSpace.Table1;
 	public static final String Table2 = globalNameSpace.Table2;

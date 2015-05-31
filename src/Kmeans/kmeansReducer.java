@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.net.PrintCommandListener;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.KeyValue;
@@ -19,10 +18,9 @@ import org.apache.hadoop.hbase.mapreduce.TableReducer;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Mapper.Context;
 
+import PrepareData.initiateData;
 import Program.globalNameSpace;
-import Program.initiateData;
 
 public class kmeansReducer extends
 		TableReducer<IntWritable, Text, ImmutableBytesWritable> {
@@ -36,11 +34,10 @@ public class kmeansReducer extends
 		centers = loadFromHTable(initiateData.Table2);
 		super.setup(context);
 	}
-	
+
 	public void reduce(IntWritable key, Iterable<Text> values, Context context)
 			throws IOException, InterruptedException {
 		numOfrow = 0;
-		newCenter = new double[numOfColumn];
 		for (Text val : values) {
 			numOfrow++;
 			calNewCenter(val.toString());
@@ -73,55 +70,13 @@ public class kmeansReducer extends
 		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x8),
 				Bytes.toBytes(newCenterInString[9]));
 
-		if(isConverged(key)){
+		if (!isConverged(key)) {
 			context.getCounter(UpdateCounter.UPDATED).increment(1);
 			context.write(HKey, HPut);
 		}
-	
-		System.out.println("UPDATED:"+context.getCounter(UpdateCounter.UPDATED).getValue());
-		
 	}
 
-	private boolean isConverged(IntWritable key) {
-		int numOfCenter =Integer.parseInt(key.toString());
-		System.out.println(numOfCenter);
-		List<Double> center=centers.get(numOfCenter);
-		double dist=0;
-		PrintList(center);
-		PrintArray(newCenter);
-		for(int i=0;i<numOfColumn;i++){
-			dist+=Math.pow(center.get(i)-Double.parseDouble(newCenterInString[i]), 2);
-		}
-		
-		if(dist>0.0001){
-			System.out.println("dist: "+dist);
-			return true;
-		}
-		
-		return false;
-	}
-
-	private void PrintArray(double[] newCenter2) {
-		for(double i:newCenter2){
-			System.out.print(i+" ");
-		}
-		System.out.println();
-	}
-
-	private void PrintList(List<Double> center) {
-		for(double i:center){
-			System.out.print(i+" ");
-		}
-		System.out.println();
-	}
-
-	private void assignNewCenter() {
-		System.out.println(numOfrow);
-		for (int i = 0; i < numOfColumn; i++) {
-			newCenterInString[i] = Double.toString(newCenter[i] / numOfrow);
-		}
-	}
-
+	//not been divided by numOfrow yet.
 	private void calNewCenter(String dataString) {
 		String[] curDataInString = new String[numOfColumn];
 		double[] curData = new double[numOfColumn];
@@ -131,9 +86,36 @@ public class kmeansReducer extends
 		}
 	}
 	
-	protected List<List<Double>> loadFromHTable(String tablename) throws IOException {
+	private void assignNewCenter() {
+		System.out.println(numOfrow);
+		for (int i = 0; i < numOfColumn; i++) {
+			newCenter[i] /= numOfrow;
+			newCenterInString[i] = Double.toString(newCenter[i]);
+		}
+	}
+	
+	private boolean isConverged(IntWritable key) {
+		int numOfCenter = Integer.parseInt(key.toString());
+		System.out.println(numOfCenter);
+		List<Double> center = centers.get(numOfCenter);
+		double dist = 0;
+		PrintList(center);
+		PrintArray(newCenter);
+		for (int i = 0; i < numOfColumn; i++) {
+			dist += Math.pow(center.get(i) - newCenter[i], 2);
+		}
+
+		if (dist > 0.0001) {
+			System.out.println("dist: " + dist);
+			return false;
+		}
+		return true;
+	}
+
+	protected List<List<Double>> loadFromHTable(String tablename)
+			throws IOException {
 		List<List<Double>> centers = new ArrayList<List<Double>>();
-		List<Double> center=new ArrayList<Double>();
+		List<Double> center = new ArrayList<Double>();
 		Configuration config = HBaseConfiguration.create();
 
 		HTable Table = new HTable(config, tablename);
@@ -141,22 +123,34 @@ public class kmeansReducer extends
 		ResultScanner ss = Table.getScanner(s);
 
 		for (Result r : ss) {
-			center=new ArrayList<Double>();
+			center = new ArrayList<Double>();
 			for (KeyValue kv : r.raw()) {
-//				System.out.println(new String(kv.getQualifier()));
-				String value=new String(kv.getValue());
-				center.add(Double.parseDouble(value));
+				// System.out.println(new String(kv.getQualifier()));
+				center.add(Double.parseDouble(new String(kv.getValue())));
 			}
 			centers.add(center);
 		}
 		return centers;
 	}
 
+	private void PrintArray(double[] newCenter2) {
+		for (double i : newCenter2) {
+			System.out.print(i + " ");
+		}
+		System.out.println();
+	}
+
+	private void PrintList(List<Double> center) {
+		for (double i : center) {
+			System.out.print(i + " ");
+		}
+		System.out.println();
+	}
+
 	public enum UpdateCounter {
 		UPDATED
 	}
 
-	
 	private static final int numOfColumn = globalNameSpace.numOfColumn;
 	private static final String Family1 = globalNameSpace.Family1;
 	private static final String Family2 = globalNameSpace.Family2;

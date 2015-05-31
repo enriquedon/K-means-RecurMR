@@ -8,7 +8,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
@@ -18,8 +17,8 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 
+import PrepareData.initiateData;
 import Program.globalNameSpace;
-import Program.initiateData;
 
 public class kmeansMapper extends TableMapper<IntWritable, Text> {
 	List<String> centers;
@@ -38,8 +37,8 @@ public class kmeansMapper extends TableMapper<IntWritable, Text> {
 		dataString = makeDataString(value);
 
 //		printcenters(dataString);
-
-		numOfClueter = new IntWritable(calculaterKmeans.calkmeans(centers,
+		calculaterKmeans calck=new calculaterKmeans();
+		numOfClueter = new IntWritable(calck.calkmeans(centers,
 				dataString));
 		dataText.set(dataString);
 		context.write(numOfClueter, dataText);
@@ -84,11 +83,8 @@ public class kmeansMapper extends TableMapper<IntWritable, Text> {
 
 	}
 
-	protected void cleanup(Context context) throws IOException,
-			InterruptedException {
-	};
 
-	protected List<String> loadFromHTable(String tablename) throws IOException {
+	private List<String> loadFromHTable(String tablename) throws IOException {
 		List<String> centers = new ArrayList<String>();
 		Configuration config = HBaseConfiguration.create();
 
@@ -99,10 +95,11 @@ public class kmeansMapper extends TableMapper<IntWritable, Text> {
 		for (Result r : ss) {
 			String centerdata = "";
 			for (KeyValue kv : r.raw()) {
-//				System.out.println(new String(kv.getQualifier()));
+				System.out.print(new String(kv.getValue())+" ");
 				centerdata += new String(kv.getValue()) + "	";
 			}
 			centers.add(centerdata);
+			System.out.println();
 		}
 		return centers;
 	}
