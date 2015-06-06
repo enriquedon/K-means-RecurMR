@@ -35,19 +35,17 @@ public class Program extends Configured implements Tool {
 	public int run(String[] args) throws Exception {
 
 		Path input = new Path(args[0]);
-		globalNameSpace.setNumOfclusters(Integer.valueOf(args[1]));
+		globalNameSpace.setNumOfclusters(Integer.valueOf(3));
 		
 
 		initiateData initdata = new initiateData();
-//		initdata.initiateHTables(input);
+		initdata.initiateHTables(input);
 		
 		kmeansJob kJob=new kmeansJob();
 		kJob.runKmeans();
 		return 0;
 	}
 
-
 	public static final int numOfColumn = globalNameSpace.numOfColumn;
-	public static final long iteration = globalNameSpace.iteration;
 	
 }

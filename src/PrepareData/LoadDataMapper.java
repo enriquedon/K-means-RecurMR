@@ -33,30 +33,35 @@ public class LoadDataMapper extends
 		Put HPut = new Put(Bytes.toBytes(rowkey));
 		Configuration conf = HBaseConfiguration.create();
 		HTable table = new HTable(conf, Table1);
-
-		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(x1),
-				Bytes.toBytes(row[0]));
-		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(x5),
-				Bytes.toBytes(row[4]));
-		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(x6),
-				Bytes.toBytes(row[5]));
-		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(y1),
-				Bytes.toBytes(row[8]));
-		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(y2),
-				Bytes.toBytes(row[9]));
+		globalNameSpace.putIntoHTable(HPut,row);
+//		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(x1),
+//				Bytes.toBytes(row[0]));
+//		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(x5),
+//				Bytes.toBytes(row[4]));
+//		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(x6),
+//				Bytes.toBytes(row[5]));
+//		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(y1),
+//				Bytes.toBytes(row[8]));
+//		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(y2),
+//				Bytes.toBytes(row[9]));
+//		
+//		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x2),
+//				Bytes.toBytes(row[1]));
+//		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x3),
+//				Bytes.toBytes(row[2]));
+//		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x4),
+//				Bytes.toBytes(row[3]));
+//		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x7),
+//				Bytes.toBytes(row[6]));
+//		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x8),
+//				Bytes.toBytes(row[7]));
 		
-		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x2),
-				Bytes.toBytes(row[1]));
-		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x3),
-				Bytes.toBytes(row[2]));
-		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x4),
-				Bytes.toBytes(row[3]));
-		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x7),
-				Bytes.toBytes(row[6]));
-		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x8),
-				Bytes.toBytes(row[7]));
-		table.put(HPut);
-		context.getCounter(RowCounter.numOfRow).increment(1);
+		ImmutableBytesWritable HKey = new ImmutableBytesWritable(
+				Bytes.toBytes(rowkey));
+		context.write(HKey, HPut);
+		table.close();
+//		table.put(HPut);
+//		context.getCounter(RowCounter.numOfRow).increment(1);
 	}
 	
 	public enum RowCounter {

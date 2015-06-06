@@ -1,10 +1,12 @@
 package Program;
 
+import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.util.Bytes;
+
 public class globalNameSpace {
 	public static final int numOfColumn = 10;
-	public static final long iteration = 3;
 	public static int numOfclusters = 1;
-	public static final String Table1 = "Energy";
+	public static final String Table1 = "input";
 	public static final String Table2 = "center";
 	public static final String Family1 = "Area";
 	public static final String Family2 = "Property";
@@ -20,6 +22,9 @@ public class globalNameSpace {
 	public static final String y1 = "Y1";
 	public static final String y2 = "Y2";
 	
+	public static final String tempOutput="outputForDY";
+//	public static final String file="dataset.txt";
+	
 	public static int getNumOfclusters() {
 		return numOfclusters;
 	}
@@ -27,7 +32,29 @@ public class globalNameSpace {
 		globalNameSpace.numOfclusters = numOfclusters;
 	}
 	
-	
+	public static void putIntoHTable(Put HPut,String[] row){
+		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(x1),
+				Bytes.toBytes(row[0]));
+		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(x5),
+				Bytes.toBytes(row[4]));
+		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(x6),
+				Bytes.toBytes(row[5]));
+		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(y1),
+				Bytes.toBytes(row[8]));
+		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(y2),
+				Bytes.toBytes(row[9]));
+		
+		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x2),
+				Bytes.toBytes(row[1]));
+		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x3),
+				Bytes.toBytes(row[2]));
+		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x4),
+				Bytes.toBytes(row[3]));
+		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x7),
+				Bytes.toBytes(row[6]));
+		HPut.add(Bytes.toBytes(Family2), Bytes.toBytes(x8),
+				Bytes.toBytes(row[7]));
+	}
 
 
 }

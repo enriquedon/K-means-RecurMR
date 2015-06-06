@@ -2,7 +2,6 @@ package Kmeans;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
@@ -26,8 +25,8 @@ public class kmeansReducer extends
 		TableReducer<IntWritable, Text, ImmutableBytesWritable> {
 
 	List<List<Double>> centers;
-	double[] newCenter = new double[numOfColumn];
-	String[] newCenterInString = new String[numOfColumn];
+	double[] newCenter;
+	String[] newCenterInString;
 	private static int numOfrow;
 
 	public void setup(Context context) throws IOException, InterruptedException {
@@ -38,16 +37,20 @@ public class kmeansReducer extends
 	public void reduce(IntWritable key, Iterable<Text> values, Context context)
 			throws IOException, InterruptedException {
 		numOfrow = 0;
+		newCenter = new double[numOfColumn];
+		newCenterInString = new String[numOfColumn];
 		for (Text val : values) {
 			numOfrow++;
 			calNewCenter(val.toString());
 		}
-		assignNewCenter();
 		System.out.println("numOfrow: " + numOfrow);
+		assignNewCenter();
+		
 		// System.out.println(f1 + f2);
 		ImmutableBytesWritable HKey = new ImmutableBytesWritable(
 				Bytes.toBytes(key.toString()));
 		Put HPut = new Put(Bytes.toBytes(key.toString()));
+		
 		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(x1),
 				Bytes.toBytes(newCenterInString[0]));
 		HPut.add(Bytes.toBytes(Family1), Bytes.toBytes(x5),
@@ -74,6 +77,8 @@ public class kmeansReducer extends
 			context.getCounter(UpdateCounter.UPDATED).increment(1);
 			context.write(HKey, HPut);
 		}
+		System.out.println();
+
 	}
 
 	//not been divided by numOfrow yet.
@@ -87,8 +92,8 @@ public class kmeansReducer extends
 	}
 	
 	private void assignNewCenter() {
-		System.out.println(numOfrow);
 		for (int i = 0; i < numOfColumn; i++) {
+			System.out.print(newCenter[i]+",");
 			newCenter[i] /= numOfrow;
 			newCenterInString[i] = Double.toString(newCenter[i]);
 		}
@@ -96,19 +101,21 @@ public class kmeansReducer extends
 	
 	private boolean isConverged(IntWritable key) {
 		int numOfCenter = Integer.parseInt(key.toString());
-		System.out.println(numOfCenter);
+		System.out.println("Cluster #"+numOfCenter);
 		List<Double> center = centers.get(numOfCenter);
 		double dist = 0;
-		PrintList(center);
-		PrintArray(newCenter);
+
 		for (int i = 0; i < numOfColumn; i++) {
 			dist += Math.pow(center.get(i) - newCenter[i], 2);
 		}
+		
 
-		if (dist > 0.0001) {
+		if (dist > 0.1) {
 			System.out.println("dist: " + dist);
+			PrintArray(newCenter);
 			return false;
 		}
+		PrintArray(newCenter);
 		return true;
 	}
 
@@ -134,17 +141,20 @@ public class kmeansReducer extends
 	}
 
 	private void PrintArray(double[] newCenter2) {
+		System.out.print("CENTER:   [");
 		for (double i : newCenter2) {
 			System.out.print(i + " ");
 		}
-		System.out.println();
+		System.out.println("]");
 	}
 
 	private void PrintList(List<Double> center) {
+		System.out.print("former center:[");
 		for (double i : center) {
+			
 			System.out.print(i + " ");
 		}
-		System.out.println();
+		System.out.println("]");
 	}
 
 	public enum UpdateCounter {

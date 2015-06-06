@@ -95,11 +95,10 @@ public class kmeansMapper extends TableMapper<IntWritable, Text> {
 		for (Result r : ss) {
 			String centerdata = "";
 			for (KeyValue kv : r.raw()) {
-				System.out.print(new String(kv.getValue())+" ");
+//				System.out.print(new String(kv.getValue())+" ");
 				centerdata += new String(kv.getValue()) + "	";
 			}
 			centers.add(centerdata);
-			System.out.println();
 		}
 		return centers;
 	}

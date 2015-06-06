@@ -1,6 +1,7 @@
 package Kmeans;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import Program.Program;
@@ -23,21 +24,22 @@ public class calculaterKmeans {
 	private int chooseTheClosetCenter(double[][] centers,
 			double[] curData) {
 		double[] curCenter = new double[numOfColumn];
-		int numOfClueter = 0;
+		int signOfClueter = 0;
 		double distance=Double.MAX_VALUE;
 		for (int i  = 0; i < centers.length; i++) {
 			double tempsum=0;
 			curCenter=centers[i];
 			for (int j = 0; j < numOfColumn; j++) {
 				tempsum+=Math.pow(curData[j]-curCenter[j], 2);
+//				tempsum+=(curData[j]-curCenter[j])*(curData[j]-curCenter[j]);
 			}
 			if(tempsum<distance){
 				distance=tempsum;
-				numOfClueter=i;
+				signOfClueter=i;
 			}
+			
 		}
-
-		return numOfClueter;
+		return signOfClueter;
 	}
 
 	private double[][] parseCenters(List<String> centersInString) {
